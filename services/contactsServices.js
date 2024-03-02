@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { v4 } from 'uuid';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const __dirname = path.resolve(path.dirname(''));
 const contactsPath = path.join(__dirname, 'db', 'contacts.json');
@@ -52,11 +53,10 @@ export const addContact = async (name, email, phone) => {
     try {
         const contacts = await listContacts();
         const newContact = {
-            id: v4,
-            name: name,
-            email: email,
-            phone: phone,
-            
+            name,
+            email,
+            phone,
+            id: uuidv4(),        
         };
         console.log(newContact);
         contacts.push(newContact);
@@ -77,7 +77,7 @@ export const contactsService = async (id, data) => {
             ...contacts[index],
             ...data
         }
-        await fs.writeFile(contactsPath.JSON.stringify(contacts));
+        await fs.writeFile(contactsPath, JSON.stringify(contacts));
         return contacts[index];
     } catch (err) {
         console.log(err.message);
