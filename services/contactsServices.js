@@ -48,15 +48,15 @@ export const removeContact = async (contactId) => {
 
 }
 
-export const addContact = async (name, email, phone) => {
+export const addContact = async (value) => {
 
     try {
         const contacts = await listContacts();
         const newContact = {
-            name,
-            email,
-            phone,
-            id: uuidv4(),        
+            id: uuidv4(), 
+            name: value.name,
+            email: value.email,
+            phone: value.phone,          
         };
         console.log(newContact);
         contacts.push(newContact);

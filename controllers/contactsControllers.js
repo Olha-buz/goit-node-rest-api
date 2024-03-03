@@ -1,4 +1,4 @@
-import { validate } from "joi";
+// import { validate } from "joi";
 import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
 import { listContacts,
     getContactById,
@@ -43,12 +43,15 @@ export const deleteContact = async (req, res) => {
 
 export const createContact = async (req, res) => {
     try {
-        const { error, name, email, phone } = createContactSchema.validate(req.body);
-        if (error) {
-            res.status(400).json({ "message": error.message });
+        const { error, value } = createContactSchema.validate(req.body);
+
+        if (!error) {
+            const newContact = await addContact(value);
+            res.status(201).json(newContact);
         }
-        const newContact = await addContact(name, email, phone);
-        res.status(201).json(newContact);
+        res.status(400).json({ "message": error.message });
+        
+
     } catch (err) {
         console.log(err.message);
         res.status(500).json({ "message": 'Internal Server Error' });
