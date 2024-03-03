@@ -1,11 +1,85 @@
-import contactsService from "../services/contactsServices.js";
+// import { validate } from "joi";
+import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
+import { listContacts,
+    getContactById,
+    removeContact,
+    addContact,
+    contactsService, } from "../services/contactsServices.js";
 
-export const getAllContacts = (req, res) => {};
+export const getAllContacts = async (req, res) => {
+    try {
+        const allContacts = await listContacts();
+        if (!allContacts) res.status(500).json({ "message": 'Something wrong' });
+        res.status(200).json({ allContacts });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({ "message": 'Internal Server Error' });
+    }
+};
 
-export const getOneContact = (req, res) => {};
+export const getOneContact = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const contact = await getContactById(id);
+        if (!contact) res.status(404).json({"message": 'Not found'})
+        res.status(200).json({ contact });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({ "message": 'Internal Server Error' });
+    }
+};
 
-export const deleteContact = (req, res) => {};
+export const deleteContact = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const remove = await removeContact(id);
+        if (!remove) res.status(404).json({ "message": "Not found" });
+        res.status(200).json({ remove });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({ "message": 'Internal Server Error' });
+    }
+};
 
-export const createContact = (req, res) => {};
+export const createContact = async (req, res) => {
+    try {
+        const { error, value } = createContactSchema.validate(req.body);
 
-export const updateContact = (req, res) => {};
+        if (!error) {
+            const newContact = await addContact(value);
+            res.status(201).json(newContact);
+        }
+        res.status(400).json({ "message": error.message });
+        
+
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({ "message": 'Internal Server Error' });
+    }
+};
+
+export const updateContact = async (req, res) => {
+    try {
+        const { error, value } = updateContactSchema.validate(req.body)
+        if (error) res.status(400).json({ "message": error.message });
+        const bodyLength = Object.keys(value).length;
+        if (bodyLength === 0) res.status(400).json({ "message": 'Whaaat?' })
+        const { id } = req.params;
+        const update = await contactsService(id, value);
+        if (!update) {
+            return res.status(404).json({"message": 'Not found'})
+        };
+        res.status(200).json({ update });
+    } catch (err) {
+        console.log(err.message);
+        res.status(500).json({ "message": 'Internal Server Error' });
+    }
+};
+
+// module.exports = {
+//     getAllContacts,
+//     getOneContact,
+//     deleteContact,
+//     createContact,
+//     updateContact,
+// }
