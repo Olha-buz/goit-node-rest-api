@@ -48,8 +48,9 @@ export const createContact = async (req, res) => {
         if (!error) {
             const newContact = await addContact(value);
             res.status(201).json(newContact);
+        } else {
+            res.status(400).json({ "message": error.message });
         }
-        res.status(400).json({ "message": error.message });
         
 
     } catch (err) {
