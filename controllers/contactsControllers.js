@@ -9,7 +9,9 @@ import { listContacts,
 export const getAllContacts = async (req, res) => {
     try {
         const allContacts = await listContacts();
-        if (!allContacts) res.status(500).json({ "message": 'Something wrong' });
+        if (!allContacts) {
+            return res.status(500).json({ "message": 'Something wrong' });
+        };
         res.status(200).json({ allContacts });
     } catch (err) {
         console.log(err.message);
@@ -21,7 +23,9 @@ export const getOneContact = async (req, res) => {
     try {
         const id = req.params.id;
         const contact = await getContactById(id);
-        if (!contact) res.status(404).json({"message": 'Not found'})
+        if (!contact) {
+            return res.status(404).json({ "message": 'Not found' })
+        };
         res.status(200).json({ contact });
     } catch (err) {
         console.log(err.message);
@@ -33,7 +37,9 @@ export const deleteContact = async (req, res) => {
     try {
         const id = req.params.id;
         const remove = await removeContact(id);
-        if (!remove) res.status(404).json({ "message": "Not found" });
+        if (!remove) {
+            return res.status(404).json({ "message": "Not found" });
+        }
         res.status(200).json({ remove });
     } catch (err) {
         console.log(err.message);
@@ -47,9 +53,9 @@ export const createContact = async (req, res) => {
 
         if (!error) {
             const newContact = await addContact(value);
-            res.status(201).json(newContact);
+            return res.status(201).json(newContact);
         } else {
-            res.status(400).json({ "message": error.message });
+            return res.status(400).json({ "message": error.message });
         }
         
 
@@ -62,9 +68,13 @@ export const createContact = async (req, res) => {
 export const updateContact = async (req, res) => {
     try {
         const { error, value } = updateContactSchema.validate(req.body)
-        if (error) res.status(400).json({ "message": error.message });
+        if (error) {
+            return res.status(400).json({ "message": error.message });
+        };
         const bodyLength = Object.keys(value).length;
-        if (bodyLength === 0) res.status(400).json({ "message": 'Whaaat?' })
+        if (bodyLength === 0) {
+            return res.status(400).json({ "message": 'Whaaat?' })
+        };
         const { id } = req.params;
         const update = await contactsService(id, value);
         if (!update) {
