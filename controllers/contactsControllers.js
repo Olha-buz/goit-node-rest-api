@@ -12,7 +12,7 @@ export const getAllContacts = async (req, res) => {
         if (!allContacts) {
             return res.status(500).json({ "message": 'Something wrong' });
         };
-        res.status(200).json({ allContacts });
+        res.status(200).json(allContacts);
     } catch (err) {
         console.log(err.message);
         res.status(500).json({ "message": 'Internal Server Error' });
@@ -26,7 +26,7 @@ export const getOneContact = async (req, res) => {
         if (!contact) {
             return res.status(404).json({ "message": 'Not found' })
         };
-        res.status(200).json({ contact });
+        res.status(200).json(contact);
     } catch (err) {
         console.log(err.message);
         res.status(500).json({ "message": 'Internal Server Error' });
@@ -40,7 +40,7 @@ export const deleteContact = async (req, res) => {
         if (!remove) {
             return res.status(404).json({ "message": "Not found" });
         }
-        res.status(200).json({ remove });
+        res.status(200).json(remove);
     } catch (err) {
         console.log(err.message);
         res.status(500).json({ "message": 'Internal Server Error' });
@@ -73,14 +73,14 @@ export const updateContact = async (req, res) => {
         };
         const bodyLength = Object.keys(value).length;
         if (bodyLength === 0) {
-            return res.status(400).json({ "message": 'Whaaat?' })
+            return res.status(400).json({ "message": 'Not found' })
         };
         const { id } = req.params;
         const update = await contactsService(id, value);
         if (!update) {
             return res.status(404).json({"message": 'Not found'})
         };
-        res.status(200).json({ update });
+        res.status(200).json(update);
     } catch (err) {
         console.log(err.message);
         res.status(500).json({ "message": 'Internal Server Error' });
