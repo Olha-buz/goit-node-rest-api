@@ -66,7 +66,7 @@ export const updateContact = async (req, res) => {
         const { error, value } = updateContactSchema.validate(req.body)
         if (error) res.status(400).json({ "message": error.message });
         const bodyLength = Object.keys(value).length;
-        if (bodyLength === 0) res.status(400).json({ "message": 'Whaaat?' })
+        if (bodyLength === 0) res.status(400).json({ "message": 'Not found' })
         const { id } = req.params;
         const update = await contactsService(id, value);
         if (!update) {
