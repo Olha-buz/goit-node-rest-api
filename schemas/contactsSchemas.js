@@ -13,7 +13,6 @@ export const updateContactSchema = Joi.object({
     phone: Joi.number()
 })
 
-// module.exports = {
-//     createContactSchema,
-//     updateContactSchema
-// }
+export const updateFavoriteSchema = Joi.object({
+    favorite: Joi.boolean()
+})

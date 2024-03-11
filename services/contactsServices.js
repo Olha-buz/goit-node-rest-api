@@ -1,66 +1,24 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
+import Types from "mongoose";
+
+import {Contact} from "../models/contactModels.js";
 
 
-const __dirname = path.resolve(path.dirname(''));
-const contactsPath = path.join(__dirname, 'db', 'contacts.json');
+export const listContacts = () => Contact.find();
 
-export const listContacts = async () => {
 
-    try {
-        const data = await fs.readFile(contactsPath);
-        return JSON.parse(data);
-    } catch (err) {
-        console.log(err.message);
-    }
-}
+export const getContactById = (id) => Contact.findById(id);
 
-export const getContactById = async (contactId) => {
 
-    try {
-        const contacts = await listContacts();
-        const findContact = contacts.find(contact => contact.id === contactId);
-        if (!findContact) {
-            return null
-        };
-        return findContact;
-    } catch (err) {
-        console.log(err.message);
-    }
-    
-}
+export const removeContact = (id) => Contact.findByIdAndDelete(id);
 
-export const removeContact = async (contactId) => {
-
-    try {
-        const contacts = await listContacts();
-        const index = contacts.findIndex(contact => contact.id === contactId);
-        if (index === -1) { return null };
-        const removeContact = contacts[index];
-        contacts.splice(index, 1);
-        await fs.writeFile(contactsPath, JSON.stringify(contacts));
-        return removeContact;
-    } catch (err) {
-        console.log(err.message);
-    }
-    
-
-}
 
 export const addContact = async (value) => {
-
+    const newContact = value.favorite ? value : {...value, "favorite":"false"}
     try {
-        const contacts = await listContacts();
-        const newContact = {
-            id: uuidv4(), 
-            name: value.name,
-            email: value.email,
-            phone: value.phone,          
-        };
-        console.log(newContact);
-        contacts.push(newContact);
-        await fs.writeFile(contactsPath, JSON.stringify(contacts));
+        Contact.create(newContact);
         return newContact; 
     } catch (err) {
         console.log(err.message);
@@ -70,24 +28,23 @@ export const addContact = async (value) => {
 
 export const contactsService = async (id, data) => {
     try {
-        const contacts = await listContacts();
-        const index = contacts.findIndex(contact => contact.id === id);
-        if (index === -1) { return null; };
-        contacts[index] = {
-            ...contacts[index],
-            ...data
-        }
-        await fs.writeFile(contactsPath, JSON.stringify(contacts));
-        return contacts[index];
+        const updateContact = await Contact.findByIdAndUpdate(id, data, { new: true });
+        console.log(updateContact);
+
+        return updateContact;
     } catch (err) {
         console.log(err.message);
     }
 }
 
-// module.exports = {
-//     listContacts,
-//     getContactById,
-//     removeContact,
-//     addContact,
-//     contactsService,
-// }
+export const updateStatusFavorite = async (id, data) => {
+    try {
+        const test = await Contact.findById(id);
+        console.log(test);
+        const statusContact = await Contact.findByIdAndUpdate(id, {favorite: data}, {new: true});
+        console.log(statusContact);
+        return statusContact;
+    } catch (err) {
+        console.log(err.message)
+    }
+}
