@@ -16,8 +16,10 @@ export const removeContact = (id) => Contact.findByIdAndDelete(id);
 
 
 export const addContact = async (value) => {
-    const newContact = value.favorite ? value : {...value, "favorite":"false"}
+    console.log(value.favorite)
+    
     try {
+        const newContact = value.favorite ? value : { ...value, "favorite": "false" }
         Contact.create(newContact);
         return newContact; 
     } catch (err) {
@@ -28,6 +30,7 @@ export const addContact = async (value) => {
 
 export const contactsService = async (id, data) => {
     try {
+
         const updateContact = await Contact.findByIdAndUpdate(id, data, { new: true });
         console.log(updateContact);
 
