@@ -1,6 +1,6 @@
 // import { validate } from "joi";
 
-import { createContactSchema, updateContactSchema, updateFavoriteSchema } from "../schemas/contactsSchemas.js";
+import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
 import { listContacts,
     getContactById,
     removeContact,
