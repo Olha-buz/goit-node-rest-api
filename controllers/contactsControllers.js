@@ -1,5 +1,6 @@
 // import { validate } from "joi";
 
+import { isValidObjectId } from "mongoose";
 import { createContactSchema, updateContactSchema } from "../schemas/contactsSchemas.js";
 import { listContacts,
     getContactById,
@@ -24,6 +25,7 @@ export const getAllContacts = async (req, res) => {
 export const getOneContact = async (req, res) => {
     try {
         const id = req.params.id;
+    
         const contact = await getContactById(id);
 
         if (!contact) {
@@ -40,6 +42,7 @@ export const getOneContact = async (req, res) => {
 export const deleteContact = async (req, res) => {
     try {
         const id = req.params.id;
+
         const remove = await removeContact(id);
 
         if (!remove) {
@@ -56,8 +59,7 @@ export const deleteContact = async (req, res) => {
 export const createContact = async (req, res) => {
     try {
         const { error, value } = createContactSchema.validate(req.body);
-        // console.log(value)
-
+        
         if (!error) {
             const newContact = await addContact(value);
             return res.status(201).json(newContact);
@@ -81,10 +83,11 @@ export const updateContact = async (req, res) => {
         const bodyLength = Object.keys(value).length;
 
         if (bodyLength === 0) {
-            return res.status(400).json({ "message": 'Not found' })
+            return res.status(400).json({ "message": 'Body must have at least one field' })
         };
 
         const { id } = req.params;
+
         const update = await contactsService(id, value);
         if (!update) {
             return res.status(404).json({"message": 'Not found'})
@@ -99,6 +102,7 @@ export const updateContact = async (req, res) => {
 export const updateStatusContact = async (req, res) => {
     try {
         const { id } = req.params;
+
         const { favorite } = req.body;
         console.log(favorite);
         const updateStatus = await updateStatusFavorite(id, favorite);
@@ -110,6 +114,14 @@ export const updateStatusContact = async (req, res) => {
         console.log(err.message);
         res.status(500).json({ "message": 'Internal Server Error' });
     }
+}
+
+export const checkId = async (req, res, next) => {
+    const { id } = req.params;
+    if (!isValidObjectId(id)) {
+        return res.status(404).json({"message": "Id is not valid"})
+    }
+    next()
 }
 
 // module.exports = {
