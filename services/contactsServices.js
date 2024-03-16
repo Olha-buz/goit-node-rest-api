@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {Contact} from "../models/contactModels.js";
 
 
-export const listContacts = (ownerId) => Contact.find(owner);
+export const listContacts = (ownerId) => Contact.find(ownerId);
 
 export const getContactById = (id, ownerId) => Contact.findById({ _id: id, ownerId });
 
