@@ -11,7 +11,7 @@ import { listContacts,
 
 export const getAllContacts = async (req, res) => {
     try {
-        const allContacts = await listContacts();
+        const allContacts = await listContacts(req.user);
         if (!allContacts) {
             return res.status(500).json({ "message": 'Something wrong' });
         };
@@ -24,9 +24,8 @@ export const getAllContacts = async (req, res) => {
 
 export const getOneContact = async (req, res) => {
     try {
-        const id = req.params.id;
     
-        const contact = await getContactById(id);
+        const contact = await getContactById(req.params.id, req.user.id);
 
         if (!contact) {
             return res.status(404).json({ "message": 'Not found' })
@@ -41,9 +40,8 @@ export const getOneContact = async (req, res) => {
 
 export const deleteContact = async (req, res) => {
     try {
-        const id = req.params.id;
 
-        const remove = await removeContact(id);
+        const remove = await removeContact(req.params.id, req.user.id);
 
         if (!remove) {
             return res.status(404).json({ "message": "Not found" });
@@ -61,7 +59,7 @@ export const createContact = async (req, res) => {
         const { error, value } = createContactSchema.validate(req.body);
         
         if (!error) {
-            const newContact = await addContact(value);
+            const newContact = await addContact(value, req.user);
             return res.status(201).json(newContact);
         } else {
             return res.status(400).json({ "message": error.message });
@@ -86,9 +84,7 @@ export const updateContact = async (req, res) => {
             return res.status(400).json({ "message": 'Body must have at least one field' })
         };
 
-        const { id } = req.params;
-
-        const update = await contactsService(id, value);
+        const update = await contactsService(req.params.id, value, req.user.id);
         if (!update) {
             return res.status(404).json({"message": 'Not found'})
         };
