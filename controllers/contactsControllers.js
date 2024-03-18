@@ -92,7 +92,7 @@ export const updateContact = async (req, res) => {
         if (checkCont.ownerId.toString() !== req.user.id) {
             return res.status(404).send({message: "Contact not found"})
         }
-        
+
         const bodyLength = Object.keys(value).length;
 
         if (bodyLength === 0) {
@@ -112,14 +112,13 @@ export const updateContact = async (req, res) => {
 
 export const updateStatusContact = async (req, res) => {
     try {
-
-        const { favorite } = req.body;
-        console.log(favorite);
-
         const checkCont = await getContactById(req.params.id);
         if (checkCont.ownerId.toString() !== req.user.id) {
             return res.status(404).send({message: "Contact not found"})
         }
+
+        const { favorite } = req.body;
+        console.log(favorite);
 
         const updateStatus = await updateStatusFavorite(req.params.id, favorite);
         if (!updateStatus) {
