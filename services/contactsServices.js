@@ -25,7 +25,7 @@ export const addContact = async (value, owner) => {
     
 }
 
-export const contactsService = async (id, data, owner) => {
+export const contactsService = async (id, data) => {
     try {
 
         const updateContact = await Contact.findByIdAndUpdate(id, data, { new: true });
