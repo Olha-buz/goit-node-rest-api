@@ -10,8 +10,9 @@ import { listContacts,
     updateStatusFavorite, } from "../services/contactsServices.js";
 
 export const getAllContacts = async (req, res) => {
+    const { id: ownerId } = req.user;
     try {
-        const allContacts = await listContacts(req.user);
+        const allContacts = await listContacts(id);
         if (!allContacts) {
             return res.status(500).json({ "message": 'Something wrong' });
         };
