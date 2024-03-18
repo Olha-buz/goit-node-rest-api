@@ -8,14 +8,14 @@ import {Contact} from "../models/contactModels.js";
 
 export const listContacts = (ownerId) => Contact.find(ownerId);
 
-export const getContactById = (id, ownerId) => Contact.findById({ _id: id, ownerId });
+export const getContactById = (id) => Contact.findById(id);
 
-export const removeContact = (id, ownerId) => Contact.findByIdAndDelete({ _id: id, ownerId });
+export const removeContact = (id) => Contact.findByIdAndDelete(id);
 
 
-export const addContact = async (value, ownerId) => {
+export const addContact = async (value, owner) => {
     try {
-        const newContact = value.favorite ? { ...value, ownerId } : { ...value, "favorite": "false", ownerId }
+        const newContact = value.favorite ? { ...value, "ownerId": owner } : { ...value, "favorite": "false", "ownerId": owner}
 
         const addContact = await Contact.create(newContact);
         return addContact; 
@@ -25,10 +25,10 @@ export const addContact = async (value, ownerId) => {
     
 }
 
-export const contactsService = async (id, data, ownerId) => {
+export const contactsService = async (id, data, owner) => {
     try {
 
-        const updateContact = await Contact.findByIdAndUpdate(id, data, { new: true }).where("ownerId").equals(ownerId);
+        const updateContact = await Contact.findByIdAndUpdate(id, data, { new: true });
         console.log(updateContact);
 
         return updateContact;
