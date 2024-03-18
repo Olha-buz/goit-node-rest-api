@@ -48,7 +48,6 @@ export const login = async (req, res, next) => {
         const token = jwt.sign(
             {
                 id: user._id,
-                name: user.name
             },
             process.env.JWT_SECRET,
             {
@@ -74,10 +73,12 @@ export const login = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
     try {
+        console.log(req.user._id)
         await User.findByIdAndUpdate(req.user._id, { token: null });
+        console.log("Logout sucsses")
         res.status(204).end();
     } catch (err) {
-        next(err)
+        res.status(401).send('Invalid token !');
     }
 };
 
