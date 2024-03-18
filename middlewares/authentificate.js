@@ -5,7 +5,7 @@ import { User } from "../models/userModels.js";
 
 export const authentificate = async (req, res, next) => {
     const authorizationHeader = req.headers.authorization;
-    console.log(authorizationHeader);
+    // console.log(authorizationHeader);
     if (typeof authorizationHeader === "undefined") {
         return res.status(401).send({message: "Invalid token v1"})
     };
@@ -15,18 +15,25 @@ export const authentificate = async (req, res, next) => {
         return res.status(401).send({message: "Invalid token v2"})
     };
 
-    try {
-        const decodeToken = jwt.verify(token, JWT_SECRET);
-        const user = await User.findById(decodeToken.id);
-        console.log(user);
-        if (!user || !user.token || user.token !== token) {
-            return res.status(401).send({ "message": "Invalid token v3" })
-        };
+    jwt.verify(token, process.env.JWT_SECRET, async (err, decode) => {
+        if (err) {
+            if (err.name === "TokenExpiredError") {
+                return res.status(401).send({message: "Token expired"})
+            } 
+            return res.status(401).send({message: "Invalid token v3"})
+        }
+
+        const user = await User.findById(decode.id);
+
+        if (user === null || user.token !== token) {
+            return res.status(401).send({message: "Invalid token v4"})
+        }
+
         req.user = user;
         next()
-    } catch (err) {
-        res.status(401).send({"message": "Invalid token v4"})
-    }
+    })
+
+
  }
     // const decodeToken = jwt.verify(token, process.env.JWT_SECRET); //WHY IT DOESN'T WORK?????
 
@@ -61,19 +68,16 @@ export const authentificate = async (req, res, next) => {
     //     }
     //     next()
     // })
+
     // try {
-    //     const { id } = jwt.verify(token, JWT_SECRET);
-    //     const user = await User.findById(id);
+    //     const decodeToken = jwt.verify(token, JWT_SECRET);
+    //     const user = await User.findById(decodeToken.id);
     //     console.log(user);
     //     if (!user || !user.token || user.token !== token) {
-    //         return res.status(401).send({"message": "Invalid token"})
+    //         return res.status(401).send({ "message": "Invalid token v3" })
     //     };
-    //     req.user = {
-    //         id: decode.id,
-    //         name: decode.name
-    //     };
+    //     req.user = user;
     //     next()
     // } catch (err) {
-    //     res.status(401).send({"message": "Invalid token"})
+    //     res.status(401).send({"message": "Invalid token v4"})
     // }
-

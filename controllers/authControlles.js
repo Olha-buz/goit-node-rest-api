@@ -19,6 +19,9 @@ export const register = async (req, res, next) => {
             email: normalizedEmail,
             password: passwordHash
         });
+        
+        console.log("Register success")
+
         res.status(201).json({
             "user": {
                 email: newUser.email,
@@ -42,7 +45,7 @@ export const login = async (req, res, next) => {
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (isMatch === false) {
-            return res.status(401).send({ "message": "Email pr password is incorrect" })
+            return res.status(401).send({ "message": "Email or password is incorrect" })
         };
 
         const token = jwt.sign(
@@ -56,6 +59,8 @@ export const login = async (req, res, next) => {
         );
 
         await User.findByIdAndUpdate(user._id, { token });
+
+        console.log("Login success")
 
         res.json({
             token,
@@ -75,8 +80,8 @@ export const logout = async (req, res, next) => {
     try {
         console.log(req.user._id)
         await User.findByIdAndUpdate(req.user._id, { token: null });
-        console.log("Logout sucsses")
-        res.status(204).end();
+        console.log("Logout success")
+        res.status(200).send({message: "Logout success"});
     } catch (err) {
         res.status(401).send('Invalid token !');
     }
