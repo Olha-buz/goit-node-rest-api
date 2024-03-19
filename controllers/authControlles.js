@@ -1,8 +1,12 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
-
+import * as fs from "fs";
+import * as path from "path";
+import gravatar from "gravatar";
+import Jimp from "jimp";
 import { User } from "../models/userModels.js";
+
 
 export const register = async (req, res, next) => {
     const { name, email, password } = req.body;
@@ -13,19 +17,20 @@ export const register = async (req, res, next) => {
         if (user !== null) {
             return res.status(409).send({ "message": "Email in use" })
         };
+        
+        const avatarURL = gravatar.url(email);
+
         const passwordHash = await bcrypt.hash(password, 10);
-        const newUser = await User.create({
-            name,
-            email: normalizedEmail,
-            password: passwordHash
-        });
+        const newUser = await User.create({...req.body, avatarURL, password: passwordHash});
         
         console.log("Register success")
+        console.log(avatarURL)
 
         res.status(201).json({
             "user": {
                 email: newUser.email,
-                subscription: newUser.subscription
+                subscription: newUser.subscription,
+                avatarURL: newUser.avatarURL,
             }
         });
     } catch (err) {
@@ -98,3 +103,34 @@ export const current = async (req, res, next) => {
         next(err)
     }
 };
+
+export const uploadAvatar = async (req, res, next) => {
+    console.log(req.file);
+    try {
+        if (!req.file) {
+            return res.status(404).send({message: "Add your file"})
+        }
+
+
+        await fs.rename(
+            req.file.path,
+            path.join(process.cwd(), "public", "avatars", req.file.filename)
+        
+        );
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { avatar: req.file.filename },
+            { new: true }
+        );
+
+        if (user === null) {
+            return res.status(404).send({ message: "User not found" })
+        };
+
+        res.status(201).send(user);
+    } catch (err) {
+        next(err);
+    }
+
+}
