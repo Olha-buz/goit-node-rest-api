@@ -5,17 +5,17 @@ import 'dotenv/config';
 import { User } from "../models/userModels.js";
 
 export const register = async (req, res, next) => {
-    const { name, email, password } = req.body;
-    const normalizedEmail = email.toLowerCase();
+    const { email, password } = req.body;
+    
 
     try {
+        const normalizedEmail = email.toLowerCase();
         const user = await User.findOne({ email: normalizedEmail });
         if (user !== null) {
             return res.status(409).send({ "message": "Email in use" })
         };
         const passwordHash = await bcrypt.hash(password, 10);
         const newUser = await User.create({
-            name,
             email: normalizedEmail,
             password: passwordHash
         });
@@ -35,8 +35,9 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     const { email, password } = req.body;
-    const normalizedEmail = email.toLowerCase();
+    
     try {
+        const normalizedEmail = email.toLowerCase();
         const user = await User.findOne({ email: normalizedEmail });
 
         if (user === null) {
