@@ -3,6 +3,7 @@ import { current, login, logout, register } from "../controllers/authControlles.
 import { authentificate } from "../middlewares/authentificate.js";
 import validateBody from "../helpers/validateBody.js";
 import { loginSchema, registerSchema } from "../schemas/userSchemas.js";
+import { upload } from "../middlewares/upload.js";
 
 const userRouter = express.Router();
 const jsonParser = express.json();
