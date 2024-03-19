@@ -1,7 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import 'dotenv/config';
+import * as fs from "fs";
+import * as path from "path";
 import gravatar from "gravatar";
+import Jimp from "jimp";
 
 import { User } from "../models/userModels.js";
 
@@ -15,7 +18,9 @@ export const register = async (req, res, next) => {
         if (user !== null) {
             return res.status(409).send({ "message": "Email in use" })
         };
+        
         const avatarURL = gravatar.url(email);
+
         const passwordHash = await bcrypt.hash(password, 10);
         const newUser = await User.create({...req.body, avatarURL, password: passwordHash});
         
