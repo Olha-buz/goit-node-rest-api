@@ -6,7 +6,8 @@ import cors from "cors";
 
 import contactsRouter from "./routes/contactsRouter.js";
 import userRouter from "./routes/authRouter.js";
-import { authentificate } from "./middlewares/authentificate.js";
+
+
 
 mongoose
     .connect(process.env.DB_URI)
