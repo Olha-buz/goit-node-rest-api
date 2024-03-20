@@ -1,11 +1,9 @@
-import * as path from "path";
+import * as path from "node:path";
 import * as crypto from "crypto";
 import multer from "multer";
 
 const storage = multer.diskStorage({
-    destination:(req, file, cb)=> {
-        cb(null, path.join(process.cwd(), 'tmp'));
-    }, 
+    destination: path.resolve("tmp"), 
     filename: (req, file, cb)=> {
         const extname = path.extname(file.originalname);
         const basename = path.basename(file.originalname, extname);
