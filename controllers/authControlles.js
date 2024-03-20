@@ -114,25 +114,28 @@ export const uploadAvatar = async (req, res, next) => {
             return res.status(404).send({message: "Add your file"})
         }
 
-        const { path: tempFile } = req.file;
-        console.log(tempFile);
+        const { path: tmpFile } = req.file;
 
-        const avatarName = `${req.user.id}_${req.file.filename}`;
-        const resultFile = path.join(avatarsDir, avatarName);
+        const img = await Jimp.read(tmpFile);
+        await img.resize(250, 250).quality(60).write(tmpFile);
 
-
-        const img = await Jimp.read(tempFile);
-        await img.resize(250, 250).quality(60).write(tempFile);
-
-        await fs.rename(tempFile, resultFile);
-        const avatarURL = path.join("avatars", avatarName);
-
-        await User.findByIdAndUpdate(
-            req.user.id,
-            { avatarURL }
+        await fs.rename(
+            tmpFile,
+            path.join(process.cwd(), "public", "avatars", req.file.filename),
+            (err) => {
+                console.log("err", err);
+            }
         );
 
-        res.status(201).send(avatarURL, img);
+        const avatarURL = path.join("avatars", req.file.filename);
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { avatarURL },
+            { new: true }
+        );
+
+        res.status(200).json({avatarURL});
     } catch (err) {
         next(err);
     }
