@@ -9,10 +9,11 @@ import { User } from "../models/userModels.js";
 
 
 export const register = async (req, res, next) => {
-    const { name, email, password } = req.body;
-    const normalizedEmail = email.toLowerCase();
+    const { email, password } = req.body;
+    
 
     try {
+        const normalizedEmail = email.toLowerCase();
         const user = await User.findOne({ email: normalizedEmail });
         if (user !== null) {
             return res.status(409).send({ "message": "Email in use" })
@@ -40,8 +41,9 @@ export const register = async (req, res, next) => {
 
 export const login = async (req, res, next) => {
     const { email, password } = req.body;
-    const normalizedEmail = email.toLowerCase();
+    
     try {
+        const normalizedEmail = email.toLowerCase();
         const user = await User.findOne({ email: normalizedEmail });
 
         if (user === null) {
@@ -104,6 +106,7 @@ export const current = async (req, res, next) => {
     }
 };
 
+const avatarsDir = path.resolve("public", "avatars");
 export const uploadAvatar = async (req, res, next) => {
     console.log(req.file);
     try {
@@ -111,24 +114,25 @@ export const uploadAvatar = async (req, res, next) => {
             return res.status(404).send({message: "Add your file"})
         }
 
+        const { path: tempFile } = req.file;
+        console.log(tempFile);
 
-        await fs.rename(
-            req.file.path,
-            path.join(process.cwd(), "public", "avatars", req.file.filename)
-        
-        );
+        const avatarName = `${req.user.id}_${req.file.filename}`;
+        const resultFile = path.join(avatarsDir, avatarName);
 
-        const user = await User.findByIdAndUpdate(
+
+        const img = await Jimp.read(tempFile);
+        await img.resize(250, 250).quality(60).write(tempFile);
+
+        await fs.rename(tempFile, resultFile);
+        const avatarURL = path.join("avatars", avatarName);
+
+        await User.findByIdAndUpdate(
             req.user.id,
-            { avatar: req.file.filename },
-            { new: true }
+            { avatarURL }
         );
 
-        if (user === null) {
-            return res.status(404).send({ message: "User not found" })
-        };
-
-        res.status(201).send(user);
+        res.status(201).send(avatarURL, img);
     } catch (err) {
         next(err);
     }
