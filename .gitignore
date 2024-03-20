@@ -133,5 +133,6 @@ dist
 tmp/*
 !tmp/.gitkeep
 
-# public/**/*
-# public/**/.gitkeep
+public/**/*
+public/**/.gitkeep
+public/**/.5190435.jpg
