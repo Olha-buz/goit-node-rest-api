@@ -12,6 +12,6 @@ userRouter.post("/register", validateBody(registerSchema), jsonParser, register)
 userRouter.post("/login", validateBody(loginSchema), jsonParser, login);
 userRouter.post("/logout", authentificate, logout);
 userRouter.get("/current", authentificate, current);
-userRouter.patch("/avatar", authentificate, upload.single("avatar"), uploadAvatar);
+userRouter.patch("/avatars", authentificate, upload.single("avatar"), uploadAvatar);
 
 export default userRouter;
