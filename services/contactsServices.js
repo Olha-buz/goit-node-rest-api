@@ -8,9 +8,9 @@ import {Contact} from "../models/contactModels.js";
 
 export const listContacts = (ownerId) => Contact.find(ownerId);
 
-export const getContactById = (id) => Contact.findById(id);
+export const getContactById = (id, owner) => Contact.findOne({ _id: id }).where("ownerId").equals(owner);
 
-export const removeContact = (id) => Contact.findByIdAndDelete(id);
+export const removeContact = (id, owner) => Contact.findByIdAndDelete(id).where("ownerId").equals(owner);
 
 
 export const addContact = async (value, owner) => {
@@ -28,7 +28,7 @@ export const addContact = async (value, owner) => {
 export const contactsService = async (id, data, owner) => {
     try {
 
-        const updateContact = await Contact.findByIdAndUpdate(id, data, { new: true });
+        const updateContact = await Contact.findByIdAndUpdate(id, data, { new: true }).where("ownerId").equals(owner);
         console.log(updateContact);
 
         return updateContact;
@@ -37,11 +37,9 @@ export const contactsService = async (id, data, owner) => {
     }
 }
 
-export const updateStatusFavorite = async (id, data, ownerId) => {
+export const updateStatusFavorite = async (id, data, owner) => {
     try {
-        const test = await Contact.findById(id, ownerId);
-        console.log(test);
-        const statusContact = await Contact.findByIdAndUpdate(id, {favorite: data}, {new: true});
+        const statusContact = await Contact.findByIdAndUpdate(id, {favorite: data}, {new: true}).where("ownerId").equals(owner);
         console.log(statusContact);
         return statusContact;
     } catch (err) {
