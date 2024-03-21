@@ -5,8 +5,8 @@ import * as fs from "fs";
 import * as path from "path";
 import gravatar from "gravatar";
 import Jimp from "jimp";
-
 import { User } from "../models/userModels.js";
+
 
 export const register = async (req, res, next) => {
     const { email, password } = req.body;
@@ -25,11 +25,13 @@ export const register = async (req, res, next) => {
         const newUser = await User.create({...req.body, avatarURL, password: passwordHash});
         
         console.log("Register success")
+        console.log(avatarURL)
 
         res.status(201).json({
             "user": {
                 email: newUser.email,
-                subscription: newUser.subscription
+                subscription: newUser.subscription,
+                avatarURL: newUser.avatarURL,
             }
         });
     } catch (err) {
@@ -103,3 +105,39 @@ export const current = async (req, res, next) => {
         next(err)
     }
 };
+
+const avatarsDir = path.resolve("public", "avatars");
+export const uploadAvatar = async (req, res, next) => {
+    console.log(req.file);
+    try {
+        if (!req.file) {
+            return res.status(404).send({message: "Add your file"})
+        }
+
+        const { path: tmpFile } = req.file;
+
+        const img = await Jimp.read(tmpFile);
+        await img.resize(250, 250).quality(60).write(tmpFile);
+
+        await fs.rename(
+            tmpFile,
+            path.join(process.cwd(), "public", "avatars", req.file.filename),
+            (err) => {
+                console.log("err", err);
+            }
+        );
+
+        const avatarURL = path.join("avatars", req.file.filename);
+
+        const user = await User.findByIdAndUpdate(
+            req.user.id,
+            { avatarURL },
+            { new: true }
+        );
+
+        res.status(200).json({avatarURL});
+    } catch (err) {
+        next(err);
+    }
+
+}
