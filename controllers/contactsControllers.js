@@ -25,16 +25,13 @@ export const getAllContacts = async (req, res) => {
 
 export const getOneContact = async (req, res) => {
     try {
-    
-        const contact = await getContactById(req.params.id);
+        console.log("req.user.id", req.user.id);
+        const contact = await getContactById(req.params.id, req.user.id);
 
         if (!contact) {
-            return res.status(404).json({ "message": 'Not found' })
+            return res.status(404).json({ "message": 'Contact not found' })
         };
 
-        if (contact.ownerId.toString() !== req.user.id) {
-            return res.status(404).send({message: "Contact not found"})
-        }
 
         res.status(200).json(contact);
     } catch (err) {
@@ -45,15 +42,11 @@ export const getOneContact = async (req, res) => {
 
 export const deleteContact = async (req, res) => {
     try {
-        const checkCont = await getContactById(req.params.id);
-        if (checkCont.ownerId.toString() !== req.user.id) {
-            return res.status(404).send({message: "Contact not found"})
-        }
 
-        const remove = await removeContact(req.params.id);
+        const remove = await removeContact(req.params.id, req.user.id);
 
         if (!remove) {
-            return res.status(404).json({ "message": "Not found" });
+            return res.status(404).json({ "message": "Contact not found" });
         }
 
         res.status(200).json(remove);
@@ -88,18 +81,14 @@ export const updateContact = async (req, res) => {
             return res.status(400).json({ "message": error.message });
         };
 
-        const checkCont = await getContactById(req.params.id);
-        if (checkCont.ownerId.toString() !== req.user.id) {
-            return res.status(404).send({message: "Contact not found"})
-        }
-
+        
         const bodyLength = Object.keys(value).length;
 
         if (bodyLength === 0) {
             return res.status(400).json({ "message": 'Body must have at least one field' })
         };
 
-        const update = await contactsService(req.params.id, value);
+        const update = await contactsService(req.params.id, value, req.user.id);
         if (!update) {
             return res.status(404).json({"message": 'Not found'})
         };
@@ -112,15 +101,11 @@ export const updateContact = async (req, res) => {
 
 export const updateStatusContact = async (req, res) => {
     try {
-        const checkCont = await getContactById(req.params.id);
-        if (checkCont.ownerId.toString() !== req.user.id) {
-            return res.status(404).send({message: "Contact not found"})
-        }
 
         const { favorite } = req.body;
         console.log(favorite);
 
-        const updateStatus = await updateStatusFavorite(req.params.id, favorite);
+        const updateStatus = await updateStatusFavorite(req.params.id, favorite, req.user.id);
         if (!updateStatus) {
             return res.status(404).json({ "message": 'Not found' })
         }
