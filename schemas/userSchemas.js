@@ -11,3 +11,6 @@ export const loginSchema = Joi.object({
     email: Joi.string().email().required()
 });
 
+export const emailSchema = Joi.object({
+    email: Joi.string().min(4).required()
+});
