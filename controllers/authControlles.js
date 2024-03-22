@@ -88,7 +88,7 @@ export const logout = async (req, res, next) => {
         console.log(req.user._id)
         await User.findByIdAndUpdate(req.user._id, { token: null });
         console.log("Logout success")
-        res.status(200).send({message: "Logout success"});
+        res.status(204).end();
     } catch (err) {
         res.status(401).send('Invalid token !');
     }
