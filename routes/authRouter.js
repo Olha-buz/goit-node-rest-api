@@ -12,8 +12,8 @@ userRouter.post("/register", validateBody(registerSchema), jsonParser, register)
 userRouter.post("/login", validateBody(loginSchema), jsonParser, login);
 userRouter.post("/logout", authentificate, logout);
 userRouter.get("/current", authentificate, current);
-userRouter.patch("/avatar", authentificate, upload.single("avatar"), uploadAvatar);
 userRouter.get("/verify/:verifyToken", verifyEmail);
 userRouter.post("/verify", validateBody(emailSchema), resendVerifyEmail);
+userRouter.patch("/avatars", authentificate, upload.single("avatar"), uploadAvatar);
 
 export default userRouter;
